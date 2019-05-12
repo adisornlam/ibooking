@@ -106,10 +106,10 @@ class GetMessageService
             $outputText = new LocationMessageBuilder("Eiffel Tower", "Champ de Mars, 5 Avenue Anatole France, 75007 Paris, France", 48.858328, 2.294750);
             $response = $this->bot->replyMessage($replyToken, $outputText);
         }
-        if ($response->isSucceeded()) {
-            logger("reply success!!");
-            return;
-        }
+        // if ($response->isSucceeded()) {
+        //     logger("reply success!!");
+        //     return;
+        // }
     }
 
     public function buttonMessagePush(Request $request) {
