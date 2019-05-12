@@ -105,6 +105,9 @@ class GetMessageService
         } else if($message === '3'){
             $outputText = new LocationMessageBuilder("Eiffel Tower", "Champ de Mars, 5 Avenue Anatole France, 75007 Paris, France", 48.858328, 2.294750);
             $response = $this->bot->replyMessage($replyToken, $outputText);
+        } else if($message === '4'){
+            $outputText = new TextMessageBuilder("เบอร์ติดต่อ 065-587-8538");
+            $response = $this->bot->replyMessage($replyToken, $outputText);
         }
         // if ($response->isSucceeded()) {
         //     logger("reply success!!");
