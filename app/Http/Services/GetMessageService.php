@@ -92,13 +92,13 @@ class GetMessageService
             return $this->push($userId, new TemplateMessageBuilder('this is a carousel template', $templateBuilder));
         } else if($message === '2'){
             $templateBuilder = new ButtonTemplateBuilder(
-                'Menu',
-                'Please select',
-                'https://firstblood.io/pages/wp-content/uploads/2018/07/dota-2-hero-guide-970x570.jpg',
+                'เช็คห้องว่าง',
+                'ห้องรายเดือนว่าง 3 ห้อง ห้องรายวันว่าง 2 ห้อง',
+                'https://images.unsplash.com/photo-1540518614846-7eded433c457?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1339&q=80',
                 [
-                    new MessageTemplateActionBuilder('Buy', 'action=buy&itemid=123'),
-                    new PostbackTemplateActionBuilder('Buy', 'action=buy&itemid=123'),
-                    new UriTemplateActionBuilder('Buy', 'http://example.com/page/123')
+                    new MessageTemplateActionBuilder('จองเลย', 'action=buy&itemid=123'),
+                    // new PostbackTemplateActionBuilder('Buy', 'action=buy&itemid=123'),
+                    new UriTemplateActionBuilder('Call', 'tel:0655878538')
                 ]
             );
             return $this->push($userId, new TemplateMessageBuilder('This is a buttons template', $templateBuilder));
