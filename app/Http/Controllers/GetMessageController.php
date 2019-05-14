@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\GetMessageRequest;
 use App\Http\Services\GetMessageService;
+use App\User;
+use App\LineUser;
 
 class GetMessageController
 {

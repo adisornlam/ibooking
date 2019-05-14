@@ -34,6 +34,7 @@ use LINE\LINEBot\TemplateActionBuilder\UriTemplateActionBuilder;
 use LINE\LINEBot\TemplateActionBuilder\MessageTemplateActionBuilder;
 
 use App\LineUser;
+use App\User;
 
 class GetMessageService
 {
@@ -56,7 +57,7 @@ class GetMessageService
 
         $eventObj = $formData['events'][0];
 
-        $replyToken = $eventObj['replyToken'];
+        $replyToken = (isset($eventObj['replyToken'])?$eventObj['replyToken']:NULL);
         $source_type = $eventObj['source']['type'];
         $message = (isset($eventObj['message']['text'])?$eventObj['message']['text']:NULL);
         $source_userId = (isset($eventObj['source']['userId'])?$eventObj['source']['userId']:NULL);
@@ -74,6 +75,16 @@ class GetMessageService
             $line_user->save();
         }else if($eventType === 'message'){
             $userMessage = strtolower($message);
+            $checkReg = preg_match('/^reg?[0-9]+/', $userMessage);
+            $checkChk = preg_match('/^chk?[0-9]+/', $userMessage);
+            if($checkChk>0){
+                $userMobile = \substr($userMessage,3);
+                $userMessage = 'reg';
+            }
+            if($checkReg>0){
+                $userMobile = \substr($userMessage,3);
+                $userMessage = 'chk';
+            }
             if($userMessage === 'สวัสดี'){
                 $msg = "สวัสดีจ้า มีอะไรให้น้องส้มจี๊ดช่วยคะ กดส่งตัวเลขมาได้เลยค่ะ \n";
                 $msg .= "กด 1 ดูรูปแบบห้องพักพร้อมราคา\n"; 
@@ -124,6 +135,20 @@ class GetMessageService
             } else if($userMessage === '4'){
                 $outputText = new TextMessageBuilder("เบอร์ติดต่อ 065-587-8538");
                 $response = $this->bot->replyMessage($replyToken, $outputText);
+            }else if($userMessage === 'reg'){
+                $user = User::where('mobile', $userMobile)->first();
+                if($user){
+                    $line_user = LineUser::where('line_user_id', $source_userId)->get();
+                    if($line_user){
+                        LineUser::where('line_user_id', $source_userId)->update(['user_id'=>$user->id]);
+
+                        $outputText = new TextMessageBuilder("ลงทะเบียนผู้ใช้งานเสร็จเรียบร้อยแล้วค่ะ \nขอบคุณที่ใช้บริการนะคะ");
+                        $response = $this->bot->replyMessage($replyToken, $outputText);
+                    }  
+                }else{
+                    $outputText = new TextMessageBuilder("ลงทะเบียนไม่สำเร็จ \nกรุณาตรวจสอบหมายเลขลงทะเบียนอีกครั้ง");
+                    $response = $this->bot->replyMessage($replyToken, $outputText);
+                }
             }
         }else if($eventType === 'join'){
             $line_user = new LineUser;
@@ -134,6 +159,21 @@ class GetMessageService
             $line_user->save();
         }
         // logger("request : ", $eventObj); 
+    }
+
+    public function pushSend($user_id)
+    {
+        $templateBuilder = new ButtonTemplateBuilder(
+            'เช็คห้องว่าง',
+            'ห้องรายเดือนว่าง 1 ห้อง ห้องรายวันว่าง 1 ห้อง',
+            'https://images.unsplash.com/photo-1540518614846-7eded433c457?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1339&q=80',
+            [
+                new MessageTemplateActionBuilder('จองเลย', 'action=buy&itemid=123'),
+                // new PostbackTemplateActionBuilder('Buy', 'action=buy&itemid=123'),
+                new UriTemplateActionBuilder('Call', 'tel:0655878538')
+            ]
+        );
+        return $this->push($user_id, new TemplateMessageBuilder('This is a buttons template', $templateBuilder));
     }
 
     protected function push($to, $messageBuilder) {

@@ -19,3 +19,4 @@ use Illuminate\Http\Request;
 // });
 
 Route::post('/get-message', ['as' => 'line.bot.message', 'uses' => 'GetMessageController@getMessage']);
+Route::post('/push-message', 'PushMessageController@push');
